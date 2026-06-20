@@ -1,10 +1,10 @@
 # @pago-sh/ingestion
 
-This ingestion framework offers a robust SDK to work with Pago's event ingestion API.
+Este framework de ingestao oferece um SDK robusto para trabalhar com a API de ingestao de eventos da pago.sh.
 
-## Basic Ingestion
+## Ingestao basica
 
-To do basic ingestion, you can use the Ingestion function directly.
+Para fazer a ingestao basica, voce pode usar a funcao Ingestion diretamente.
 
 ```typescript
 import { Ingestion } from "@pago-sh/ingestion";
@@ -12,7 +12,7 @@ import { Ingestion } from "@pago-sh/ingestion";
 await Ingestion({
   accessToken: process.env.PAGO_ACCESS_TOKEN,
 }).ingest([
-  // Ingest using Pago Customer ID
+  // Ingestao usando o Customer ID da pago.sh
   {
     name: "<value>",
     customerId: "<value>",
@@ -20,7 +20,7 @@ await Ingestion({
       myProp: "value",
     },
   },
-  // Ingest using External Customer ID from your Database
+  // Ingestao usando o Customer ID externo do seu banco de dados
   {
     name: "<value>",
     externalCustomerId: "<id>",
@@ -31,7 +31,7 @@ await Ingestion({
 ]);
 ```
 
-Or you can use the Pago SDK's Event API.
+Ou voce pode usar a Event API do SDK da pago.sh.
 
 ```typescript
 import { Pago } from "@pago-sh/sdk";
@@ -42,7 +42,7 @@ const pago = new Pago({
 
 await pago.events.ingest({
   events: [
-    // Ingest using Pago Customer ID
+    // Ingestao usando o Customer ID da pago.sh
     {
       name: "<value>",
       customerId: "<value>",
@@ -50,7 +50,7 @@ await pago.events.ingest({
         myProp: "value",
       },
     },
-    // Ingest using External Customer ID from your Database
+    // Ingestao usando o Customer ID externo do seu banco de dados
     {
       name: "<value>",
       externalCustomerId: "<id>",
@@ -62,13 +62,13 @@ await pago.events.ingest({
 });
 ```
 
-### Associating Costs with Events
+### Associando custos a eventos
 
-With the Pago Event Ingestion API, you can annotate arbitrary costs with events. This unlock the possibility to see Customer Costs, Margins & Cashflow in your Pago Dashboard.
+Com a API de ingestao de eventos da pago.sh, voce pode anotar custos arbitrarios nos eventos. Isso libera a possibilidade de visualizar custos por cliente, margens e fluxo de caixa no seu Dashboard da pago.sh.
 
-This is especially powerful with LLM calls, as token consumption typically comes with a cost for your business.
+Isso e especialmente poderoso com chamadas a LLMs, ja que o consumo de tokens normalmente acarreta um custo para o seu negocio.
 
-[Learn more about cost ingestion](https://pago.sh/docs/features/cost-insights/cost-events)
+[Saiba mais sobre a ingestao de custos](https://pago.sh/docs/features/cost-insights/cost-events)
 
 ```typescript
 import { Pago } from "@pago-sh/sdk";
@@ -79,14 +79,14 @@ const pago = new Pago({
 
 await pago.events.ingest({
   events: [
-    // Ingest using Pago Customer ID
+    // Ingestao usando o Customer ID da pago.sh
     {
       name: "<value>",
       customerId: "<value>",
       metadata: {
         myProp: "<value>",
         _cost: {
-          amount: 100, // Amount is expected to be in cents. $1.23 should be represented as 123
+          amount: 100, // O valor deve estar em centavos. $1.23 deve ser representado como 123
           currency: "usd",
         },
       },
@@ -95,13 +95,13 @@ await pago.events.ingest({
 });
 ```
 
-## Strategies
+## Estrategias
 
-Want to report events regarding Large Language Model usage, S3 file uploads or something else? Our Ingestion strategies are customized to make it as seamless as possible to fire ingestion events for complex needs.
+Quer reportar eventos relacionados ao uso de Large Language Models, uploads de arquivos no S3 ou algo mais? Nossas estrategias de ingestao sao personalizadas para tornar o disparo de eventos de ingestao o mais simples possivel, mesmo para necessidades complexas.
 
-### LLM Strategy
+### Estrategia LLM
 
-Wrap any LLM model from the `@ai-sdk/*` library, to automatically fire prompt- & completion tokens used by every model call.
+Envolva qualquer modelo de LLM da biblioteca `@ai-sdk/*` para disparar automaticamente os tokens de prompt e de completion usados a cada chamada do modelo.
 
 ```
 pnpm add @pago-sh/ingestion ai @ai-sdk/openai
@@ -114,12 +114,12 @@ import { generateText } from "ai";
 import { openai } from "@ai-sdk/openai";
 
 /**
- * Setup the LLM Ingestion Strategy
+ * Configurando a estrategia de ingestao LLM
  *
- * 1. We initilize the Ingestion object with a Pago Access Token
- * 2. We attach the LLM Strategy to the ingestion instance
- * 3. (Optional) - We can calculate a cost for the LLM call, and associate it with the event
- * 4. We finally declare what name the ingested event should have
+ * 1. Inicializamos o objeto Ingestion com um Access Token da pago.sh
+ * 2. Anexamos a estrategia LLM a instancia de ingestao
+ * 3. (Opcional) - Podemos calcular um custo para a chamada do LLM e associa-lo ao evento
+ * 4. Por fim, declaramos qual nome o evento ingerido deve ter
  */
 const llmIngestion = Ingestion({ accessToken: process.env.PAGO_ACCESS_TOKEN })
   .strategy(new LLMStrategy(openai("gpt-4o")))
@@ -129,8 +129,8 @@ const llmIngestion = Ingestion({ accessToken: process.env.PAGO_ACCESS_TOKEN })
 export async function POST(req: Request) {
   const { prompt }: { prompt: string } = await req.json();
 
-  // Get the wrapped LLM model with ingestion capabilities
-  // Pass Customer Id to properly annotate the ingestion events with a specific customer
+  // Obtenha o modelo de LLM encapsulado com capacidades de ingestao
+  // Passe o Customer Id para anotar corretamente os eventos de ingestao com um cliente especifico
   const model = llmIngestion.client({
     customerId: request.headers.get("X-Pago-Customer-Id") ?? "",
   });
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
 }
 ```
 
-#### Ingestion Payload
+#### Payload de ingestao
 
 ```json
 {
@@ -160,7 +160,7 @@ export async function POST(req: Request) {
     "provider": "openai.responses",
     "strategy": "LLM",
     "_cost": {
-      "amount": 123, // Amount is expected to be in cents. $1.23 should be represented as 123
+      "amount": 123, // O valor deve estar em centavos. $1.23 deve ser representado como 123
       "currency": "usd"
     },
     "_llm": {
@@ -170,9 +170,9 @@ export async function POST(req: Request) {
 }
 ```
 
-### S3 Strategy
+### Estrategia S3
 
-Wrap the official AWS S3 Client with our S3 Ingestion Strategy to automatically ingest bytes uploaded.
+Envolva o AWS S3 Client oficial com nossa estrategia de ingestao S3 para ingerir automaticamente os bytes enviados.
 
 ```
 pnpm add @pago-sh/ingestion @aws-sdk/client-s3
@@ -192,15 +192,15 @@ const s3Client = new S3Client({
   },
 });
 
-// Setup the S3 Ingestion Strategy
+// Configurando a estrategia de ingestao S3
 const s3Ingestion = Ingestion({ accessToken: process.env.PAGO_ACCESS_TOKEN })
   .strategy(new S3Strategy(s3Client))
   .ingest("s3-uploads");
 
 export async function POST(request: Request) {
   try {
-    // Get the wrapped S3 Client
-    // Pass Customer Id to properly annotate the ingestion events with a specific customer
+    // Obtenha o S3 Client encapsulado
+    // Passe o Customer Id para anotar corretamente os eventos de ingestao com um cliente especifico
     const s3 = s3Ingestion.client({
       customerId: request.headers.get("X-Pago-Customer-Id") ?? "",
     });
@@ -224,7 +224,7 @@ export async function POST(request: Request) {
 }
 ```
 
-#### Ingestion Payload
+#### Payload de ingestao
 
 ```json
 {
@@ -240,9 +240,9 @@ export async function POST(request: Request) {
 }
 ```
 
-### Stream Strategy
+### Estrategia Stream
 
-Wrap any Readable or Writable stream of choice to automatically ingest the bytes consumed.
+Envolva qualquer stream Readable ou Writable de sua escolha para ingerir automaticamente os bytes consumidos.
 
 ```
 pnpm add @pago-sh/ingestion
@@ -254,7 +254,7 @@ import { StreamStrategy } from '@pago-sh/ingestion/strategies/Stream';
 
 const myReadstream = createReadStream(...);
 
-// Setup the Stream Ingestion Strategy
+// Configurando a estrategia de ingestao Stream
 const streamIngestion = Ingestion({ accessToken: process.env.PAGO_ACCESS_TOKEN })
   .strategy(new StreamStrategy(myReadstream))
   .ingest("my-stream");
@@ -262,13 +262,13 @@ const streamIngestion = Ingestion({ accessToken: process.env.PAGO_ACCESS_TOKEN }
 export async function GET(request: Request) {
   try {
 
-    // Get the wrapped stream
-    // Pass Customer Id to properly annotate the ingestion events with a specific customer
+    // Obtenha o stream encapsulado
+    // Passe o Customer Id para anotar corretamente os eventos de ingestao com um cliente especifico
     const stream = streamIngestion.client({
       customerId: request.headers.get("X-Pago-Customer-Id") ?? ""
     });
 
-    // Consume stream...
+    // Consuma o stream...
     stream.on('data', () => ...)
 
     return Response.json({});
@@ -278,7 +278,7 @@ export async function GET(request: Request) {
 }
 ```
 
-#### Ingestion Payload
+#### Payload de ingestao
 
 ```json
 {
@@ -291,9 +291,9 @@ export async function GET(request: Request) {
 }
 ```
 
-### DeltaTime Strategy
+### Estrategia DeltaTime
 
-Ingest delta time of arbitrary execution. Bring your own now-resolver.
+Faca a ingestao do delta de tempo de uma execucao arbitraria. Traga o seu proprio now-resolver.
 
 ```
 pnpm add @pago-sh/ingestion
@@ -307,7 +307,7 @@ const nowResolver = () => performance.now();
 // const nowResolver = () => Number(hrtime.bigint())
 // const nowResolver = () => Date.now()
 
-// Setup the Delta Time Ingestion Strategy
+// Configurando a estrategia de ingestao Delta Time
 const deltaTimeIngestion = Ingestion({
   accessToken: process.env.PAGO_ACCESS_TOKEN,
 })
@@ -316,8 +316,8 @@ const deltaTimeIngestion = Ingestion({
 
 export async function GET(request: Request) {
   try {
-    // Get the wrapped start clock function
-    // Pass Customer Id to properly annotate the ingestion events with a specific customer
+    // Obtenha a funcao encapsulada que inicia o cronometro
+    // Passe o Customer Id para anotar corretamente os eventos de ingestao com um cliente especifico
     const start = deltaTimeIngestion.client({
       customerId: request.headers.get("X-Pago-Customer-Id") ?? "",
     });
@@ -326,7 +326,7 @@ export async function GET(request: Request) {
 
     await sleep(1000);
 
-    // { deltaTime: xxx } is automatically ingested to Pago
+    // { deltaTime: xxx } e ingerido automaticamente na pago.sh
     const delta = stop();
 
     return Response.json({ delta });
@@ -336,7 +336,7 @@ export async function GET(request: Request) {
 }
 ```
 
-#### Ingestion Payload
+#### Payload de ingestao
 
 ```json
 {

@@ -1,7 +1,7 @@
 {
   "name": "@pago-sh/ingestion",
   "version": "0.4.2",
-  "description": "Core package for Pago ingestion",
+  "description": "Pacote principal de ingestao de eventos da pago.sh",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
