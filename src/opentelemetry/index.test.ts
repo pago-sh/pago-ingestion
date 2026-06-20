@@ -211,7 +211,7 @@ describe("PagoTraceExporter", () => {
 
     it("should handle export errors and return FAILED status", async () => {
       // Create a separate exporter for this test to avoid conflicts
-      const error = new Error("Network error");
+      const error = new Error("Erro de rede");
 
       // Create a new provider without the pago exporter to avoid double export
       const testProvider = new NodeTracerProvider({
