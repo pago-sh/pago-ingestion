@@ -9,9 +9,9 @@ import { ExportResultCode } from "@opentelemetry/core";
 
 const mockEventsIngest = vi.fn();
 
-// Mock the Polar SDK
-vi.mock("@polar-sh/sdk", async (importOriginal) => {
-  class Polar {
+// Mock the Pago SDK
+vi.mock("@pago-sh/sdk", async (importOriginal) => {
+  class Pago {
     events = {
       ingest: mockEventsIngest,
     };
@@ -19,15 +19,15 @@ vi.mock("@polar-sh/sdk", async (importOriginal) => {
 
   return {
     ...(await importOriginal()),
-    Polar,
+    Pago,
   };
 });
 
-import { PolarTraceExporter } from "./index";
+import { PagoTraceExporter } from "./index";
 
-describe("PolarTraceExporter", () => {
+describe("PagoTraceExporter", () => {
   let provider: NodeTracerProvider;
-  let polarExporter: PolarTraceExporter;
+  let pagoExporter: PagoTraceExporter;
   let memoryExporter: InMemorySpanExporter;
 
   beforeEach(async () => {
@@ -36,13 +36,13 @@ describe("PolarTraceExporter", () => {
 
     // Set up OpenTelemetry exporters
     memoryExporter = new InMemorySpanExporter();
-    polarExporter = new PolarTraceExporter({ accessToken: "test-token" });
+    pagoExporter = new PagoTraceExporter({ accessToken: "test-token" });
 
     // Create provider with both span processors
     provider = new NodeTracerProvider({
       spanProcessors: [
         new SimpleSpanProcessor(memoryExporter),
-        new SimpleSpanProcessor(polarExporter),
+        new SimpleSpanProcessor(pagoExporter),
       ],
     });
 
@@ -213,7 +213,7 @@ describe("PolarTraceExporter", () => {
       // Create a separate exporter for this test to avoid conflicts
       const error = new Error("Network error");
 
-      // Create a new provider without the polar exporter to avoid double export
+      // Create a new provider without the pago exporter to avoid double export
       const testProvider = new NodeTracerProvider({
         spanProcessors: [new SimpleSpanProcessor(memoryExporter)],
       });
@@ -234,7 +234,7 @@ describe("PolarTraceExporter", () => {
 
       // Test the exporter directly with the real spans
       await new Promise<void>((resolve) => {
-        polarExporter.export(exportedSpans, (result) => {
+        pagoExporter.export(exportedSpans, (result) => {
           expect(result.code).toBe(ExportResultCode.FAILED);
           expect(result.error).toBe(error);
           resolve();
@@ -246,7 +246,7 @@ describe("PolarTraceExporter", () => {
 
     it("should handle empty spans array", async () => {
       await new Promise<void>((resolve) => {
-        polarExporter.export([], (result) => {
+        pagoExporter.export([], (result) => {
           expect(result.code).toBe(ExportResultCode.SUCCESS);
           resolve();
         });
@@ -410,7 +410,7 @@ describe("PolarTraceExporter", () => {
 
   describe("shutdown", () => {
     it("should resolve immediately", async () => {
-      const result = await polarExporter.shutdown();
+      const result = await pagoExporter.shutdown();
       expect(result).toBeUndefined();
     });
   });

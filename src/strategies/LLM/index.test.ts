@@ -4,8 +4,8 @@ import { LLMStrategy } from ".";
 const mockEventsIngest = vi.fn();
 
 // Mock the module before any imports
-vi.mock("@polar-sh/sdk", async (importOriginal) => {
-  class Polar {
+vi.mock("@pago-sh/sdk", async (importOriginal) => {
+  class Pago {
     events = {
       ingest: mockEventsIngest,
     };
@@ -13,7 +13,7 @@ vi.mock("@polar-sh/sdk", async (importOriginal) => {
 
   return {
     ...(await importOriginal()),
-    Polar,
+    Pago,
   };
 });
 

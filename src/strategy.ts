@@ -1,5 +1,5 @@
-import type { CostMetadataInput } from "@polar-sh/sdk/models/components/costmetadatainput.js";
-import { type IngestionContext, PolarIngestion } from "./ingestion";
+import type { CostMetadataInput } from "@pago-sh/sdk/models/components/costmetadatainput.js";
+import { type IngestionContext, PagoIngestion } from "./ingestion";
 
 export type IngestionStrategyCustomer = {
   customerId: string;
@@ -22,7 +22,7 @@ export type IngestionStrategyContext = IngestionContext & {
 export abstract class IngestionStrategy<
   TUsageContext extends IngestionStrategyContext,
   TStrategyClient
-> extends PolarIngestion<TUsageContext> {
+> extends PagoIngestion<TUsageContext> {
   public createExecutionHandler(): IngestionExecutionHandler<TUsageContext> {
     return async (
       context: TUsageContext,

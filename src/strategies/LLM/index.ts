@@ -11,8 +11,8 @@ import {
   type IngestionStrategyCustomer,
   type IngestionStrategyExternalCustomer,
 } from "../../strategy";
-import type { CostMetadataInput } from "@polar-sh/sdk/models/components/costmetadatainput.js";
-import type { LLMMetadata } from "@polar-sh/sdk/models/components/llmmetadata.js";
+import type { CostMetadataInput } from "@pago-sh/sdk/models/components/costmetadatainput.js";
+import type { LLMMetadata } from "@pago-sh/sdk/models/components/llmmetadata.js";
 
 export type LLMStrategyContext = IngestionContext<{
   inputTokens: number;

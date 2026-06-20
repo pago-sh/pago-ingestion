@@ -1,9 +1,9 @@
 import type { SpanExporter, ReadableSpan } from "@opentelemetry/sdk-trace-base";
 import { ExportResultCode, type ExportResult } from "@opentelemetry/core";
-import { Polar, type SDKOptions } from "@polar-sh/sdk";
-import type { EventCreateCustomer } from "@polar-sh/sdk/models/components/eventcreatecustomer.js";
-import type { EventCreateExternalCustomer } from "@polar-sh/sdk/models/components/eventcreateexternalcustomer.js";
-import type { EventMetadataInput } from "@polar-sh/sdk/models/components/eventmetadatainput.js";
+import { Pago, type SDKOptions } from "@pago-sh/sdk";
+import type { EventCreateCustomer } from "@pago-sh/sdk/models/components/eventcreatecustomer.js";
+import type { EventCreateExternalCustomer } from "@pago-sh/sdk/models/components/eventcreateexternalcustomer.js";
+import type { EventMetadataInput } from "@pago-sh/sdk/models/components/eventmetadatainput.js";
 
 const convertAttributesToMetadata = (
   attributes: ReadableSpan["attributes"]
@@ -26,7 +26,7 @@ const convertAttributesToMetadata = (
 const customerIdKey = "customerId" as const;
 const externalCustomerIdKey = "externalCustomerId" as const;
 
-const convertSpanToPolarEvent = (
+const convertSpanToPagoEvent = (
   span: ReadableSpan
 ): (EventCreateCustomer | EventCreateExternalCustomer) | null => {
   const customerId = span.attributes[customerIdKey];
@@ -55,7 +55,7 @@ const convertSpanToPolarEvent = (
   return null;
 };
 
-export class PolarTraceExporter implements SpanExporter {
+export class PagoTraceExporter implements SpanExporter {
   constructor(private options: SDKOptions) {}
 
   async export(
@@ -70,12 +70,12 @@ export class PolarTraceExporter implements SpanExporter {
       );
 
       const payload = spansWithCustomerId
-        .map(convertSpanToPolarEvent)
+        .map(convertSpanToPagoEvent)
         .filter((event) => event !== null);
 
-      const polar = new Polar(this.options);
+      const pago = new Pago(this.options);
 
-      await polar.events.ingest({
+      await pago.events.ingest({
         events: payload,
       });
 
